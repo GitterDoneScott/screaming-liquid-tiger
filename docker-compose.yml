@@ -1,0 +1,35 @@
+version: "3.3"
+services:
+  audiobooks_rss:
+    image: acec4b9f0fe4
+    restart: always
+    expose:
+      - "80"
+    volumes:
+      - type: volume
+        source: audiobooks
+        target: /var/www/html/media
+        volume:
+          read_only: true
+          nocopy: true
+    environment:
+      - "VIRTUAL_HOST=audiobooksrss.${DNS_SUFFIX:-local}"
+      - "LETSENCRYPT_HOST=audiobooksrss.${DNS_SUFFIX:-local}"
+      - "LETSENCRYPT_EMAIL=${LETS_ENC_EMAIL:-SUBFAIL}"
+    networks:
+      - reverse-proxy
+    labels:
+      container_group: library
+
+
+networks:
+  reverse-proxy:
+    external: true
+
+volumes:
+  audiobooks:
+    driver: "local"
+    driver_opts:
+      device: "${VOL_DEVICE_PREFIX:-SUBFAIL}/books/Audio\ books"
+      type: ${VOL_TYPE:-SUBFAIL}
+      o: ${VOL_OPS:-SUBFAIL}
